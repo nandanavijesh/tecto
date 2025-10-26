@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Auth System</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Using LATO font for professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+    <!-- 
+        =========================================================
+        [ CUSTOM STYLESHEET (Simulated style.css) ]
+        All theme definitions and button animations are here.
+        
+        ACCENT COLOR: ELECTRIC PURPLE (#8b5cf6 / violet-500)
+        =========================================================
+    -->
+    <style>
+        /* 1. BASE THEME (Charcoal Gray & ELECTRIC PURPLE Accent) */
+        body {
+            /* Deep charcoal background for the main canvas */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+            min-height: 100vh;
+            /* Main text color is soft white */
+            color: #f3f4f6;
+            font-family: 'Lato', sans-serif;
+        }
+        
+        /* Card Hover Animation (Lifting Effect) */
+        .card {
+            background-color: #1f2937; /* Darker card background */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Admin Panel Warning Glow (Red accent) */
+        .admin-glow {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.8), inset 0 0 5px rgba(239, 68, 68, 0.4); 
+            border: 1px solid rgba(239, 68, 68, 0.6);
+        }
+
+        /* Accent Color Utilities (Electric Purple) */
+        .text-accent {
+            color: #8b5cf6; /* Tailwind violet-500 */
+        }
+        
+        .hover-text-accent:hover {
+            color: #7c3aed; /* Tailwind violet-600 */
+        }
+
+        /* Input Focus Ring Styling (using Purple accent) */
+        input:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.5) !important; /* Purple with transparency */
+        }
+        
+        /* 2. MODERN BUTTON ANIMATIONS */
+
+        /* Primary Button (Electric Purple) - Lift and Press Effect */
+        .btn-primary {
+            background-color: #8b5cf6; /* Tailwind violet-500 */
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.5);
+            transition: all 0.2s ease-in-out; 
+        }
+
+        .btn-primary:hover {
+            background-color: #7c3aed; /* Tailwind violet-600 */
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.8);
+            transform: translateY(-2px); 
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px) scale(0.98); 
+            box-shadow: 0 2px 5px rgba(139, 92, 246, 0.5); 
+        }
+
+        /* Secondary Button (Dark Gray) - Subtle Lift and Press Effect (color unchanged) */
+        .btn-secondary-dark {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-secondary-dark:hover {
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-secondary-dark:active {
+            transform: translateY(1px) scale(0.99); 
+            box-shadow: none;
+        }
+
+        /* Nav Link Animation */
+        nav button {
+             transition: color 0.15s ease-in-out;
+        }
+    </style>
+    <!-- 
+        =========================================================
+        [ END CUSTOM STYLESHEET ]
+        =========================================================
+    -->
+
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Navigation - Dark Gray/Charcoal Background -->
+    <header class="bg-gray-900 border-b border-gray-700 shadow-xl"> 
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex justify-between items-center">
+            <!-- Branding using the vibrant purple accent color -->
+            <div class="flex items-center space-x-2">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v3h8z"></path></svg>
+                <h1 class="text-2xl font-black text-white tracking-wider">SECURE WEB</h1>
+            </div>
+            
+            <nav class="flex space-x-6 items-center">
+                <!-- Navigation links use smooth transitions defined in custom CSS -->
+                <button id="dashboard-link" onclick="navigate('dashboard')" class="text-gray-300 hover:text-accent font-medium">Dashboard</button>
+                <button id="admin-link" onclick="navigate('admin')" class="text-gray-300 hover:text-accent font-medium hidden">Admin Panel</button>
+                
+                <!-- PRIMARY ACTION BUTTON uses the new Electric Purple accent class with animations -->
+                <button id="auth-button" class="px-5 py-2 btn-primary text-white rounded-lg shadow-lg font-semibold" onclick="handleAuthAction()">
+                    Login / Register
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="app-container" class="flex-grow flex items-center justify-center p-4">
+        <!-- Content will be injected here -->
+    </main>
+    
+    <!-- Watermark/Footer - Added for branding -->
+    <footer class="w-full py-2 text-center text-xs text-gray-500 bg-gray-900 border-t border-gray-800">
+        Developed by <span class="font-semibold text-gray-400">Nandana Vijesh</span>
+    </footer>
+
+    <!-- Error/Message Modal (replaces alert()) -->
+    <div id="message-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm hidden flex items-center justify-center z-50 transition-opacity duration-300">
+        <!-- Modal card is slightly lighter than the main background -->
+        <div class="bg-gray-800 rounded-xl card p-6 w-full max-w-sm mx-4 text-white border border-gray-700">
+            <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+            <p id="modal-content" class="text-gray-300 mb-4"></p>
+            <!-- Modal button using the new primary accent style with animations -->
+            <button onclick="closeModal()" class="w-full px-4 py-2 btn-primary text-white rounded-md">Close</button>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal for Deletion -->
+    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm hidden flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="bg-gray-800 rounded-xl card p-6 w-full max-w-sm mx-4 text-white border border-gray-700">
+            <h3 class="text-xl font-bold text-red-400 mb-2">Confirm Account Deletion</h3>
+            <p id="confirm-content" class="text-gray-300 mb-4">Are you sure you want to delete this account?</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-semibold btn-secondary-dark">Cancel</button>
+                <button id="confirm-action-button" onclick="executeConfirmAction()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-semibold">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- 1. MOCK BACKEND / SECURITY UTILITIES ---
+
+        // Keys for localStorage to simulate a database and token storage
+        const USER_DB_KEY = 'mock_user_db';
+        const TOKEN_KEY = 'user_auth_token';
+        const SECRET_KEY = 'mock-secret-key-for-jwt-signing'; // Mock secret for JWT signature verification
+
+        let pendingConfirmAction = null; // Stores the function to execute upon confirmation
+        
+        /**
+         * Toggles the type of the input field between 'password' and 'text' 
+         * and swaps the SVG icon between eye-open and eye-closed.
+         */
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                // Change icon to eye-slash (closed eye)
+                icon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.679 5.679A5 5 0 1112.5 10.5M10.75 1.4L18 8.65l-2.8 2.8L10.75 1.4zM4.75 4.7L18.6 18.55l-2.8 2.8L4.75 4.7zM2.432 10.158A11.956 11.956 0 0112 1c4.97 0 9.213 2.91 11 7.234"></path></svg>`;
+            } else {
+                input.type = 'password';
+                // Change icon to eye (open eye)
+                icon.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            }
+        }
+
+
+        /**
+         * Utility to display user-friendly messages instead of alert().
+         */
+        function showMessage(title, message, type = 'info') {
+            const modal = document.getElementById('message-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+
+            modalTitle.textContent = title;
+            modalContent.textContent = message;
+
+            modalTitle.className = 'text-xl font-bold mb-2';
+            if (type === 'error') {
+                modalTitle.classList.add('text-red-400'); // Light red for visibility
+            } else if (type === 'success') {
+                modalTitle.classList.add('text-accent'); // Use purple accent color for success
+            } else {
+                modalTitle.classList.add('text-white');
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('message-modal').classList.add('hidden');
+        }
+
+        /**
+         * Utility to display a confirmation modal (replaces confirm()).
+         */
+        function showConfirmModal(message, actionCallback) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-content').textContent = message;
+            pendingConfirmAction = actionCallback;
+            modal.classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            pendingConfirmAction = null;
+        }
+
+        function executeConfirmAction() {
+            closeConfirmModal();
+            if (typeof pendingConfirmAction === 'function') {
+                pendingConfirmAction();
+            }
+        }
+
+
+        // --- Simulated Hashing (for password security) ---
+        // Uses SubtleCrypto API to simulate real-world hashing
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function comparePassword(password, storedHash) {
+            const incomingHash = await hashPassword(password);
+            return incomingHash === storedHash;
+        }
+
+        // --- Simulated JWT Token Management ---
+        function generateToken(user) {
+            const payload = {
+                userId: user.id,
+                email: user.email,
+                role: user.role,
+                exp: Date.now() + (3600 * 1000) // Token expires in 1 hour
+            };
+            const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+            const tokenPayload = btoa(JSON.stringify(payload));
+            const signature = btoa(SECRET_KEY); // Simple signature check
+            return `${header}.${tokenPayload}.${signature}`;
+        }
+
+        function decodeToken(token) {
+            if (!token) return null;
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) return null;
+
+                const payload = JSON.parse(atob(parts[1]));
+                const signatureCheck = atob(parts[2]);
+
+                if (signatureCheck !== SECRET_KEY) return null; // Signature verification
+                
+                // Expiration check
+                if (payload.exp < Date.now()) {
+                    console.warn("Token expired.");
+                    return null;
+                }
+
+                return payload;
+            } catch (e) {
+                console.error("Token decoding failed:", e);
+                return null;
+            }
+        }
+
+        // --- Mock Database (localStorage) Operations ---
+        function getUsers() {
+            const users = localStorage.getItem(USER_DB_KEY);
+            return users ? JSON.parse(users) : {};
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(USER_DB_KEY, JSON.stringify(users));
+        }
+
+
+        // --- 2. AUTHENTICATION SERVICE IMPLEMENTATION ---
+        let currentState = {
+            isAuthenticated: false,
+            user: null,
+            // Initialize currentView based on the hash if present, otherwise default to 'login'
+            currentView: window.location.hash.substring(1) || 'login'
+        };
+
+        async function registerUser(email, password) {
+            const users = getUsers();
+            if (users[email]) {
+                return { success: false, message: 'This email is already registered. Try logging in.' };
+            }
+            if (password.length < 6) {
+                return { success: false, message: 'Password must be at least 6 characters long.' };
+            }
+
+            // The first registered user is automatically assigned the 'admin' role
+            const hashedPassword = await hashPassword(password);
+            const newUser = {
+                id: crypto.randomUUID(),
+                email: email,
+                passwordHash: hashedPassword,
+                role: Object.keys(users).length === 0 ? 'admin' : 'user'
+            };
+
+            users[email] = newUser;
+            saveUsers(users);
+
+            return { success: true, message: `Registration successful! Your role is: ${newUser.role}. You can now log in.` };
+        }
+
+        async function loginUser(email, password) {
+            const users = getUsers();
+            const user = users[email];
+
+            if (!user || !(await comparePassword(password, user.passwordHash))) {
+                return { success: false, message: 'Invalid credentials (email or password incorrect).' };
+            }
+
+            const token = generateToken(user);
+            localStorage.setItem(TOKEN_KEY, token);
+
+            return { success: true, message: 'Login successful!', token: token };
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(TOKEN_KEY);
+            currentState.isAuthenticated = false;
+            currentState.user = null;
+            // Update UI after logging out
+            updateUI(); 
+            navigate('login');
+            showMessage('Logged Out', 'You have been securely logged out. Come back soon!', 'info');
+        }
+
+        function checkAuthentication() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            const payload = decodeToken(token);
+
+            if (payload) {
+                currentState.isAuthenticated = true;
+                currentState.user = payload;
+                return true;
+            } else {
+                localStorage.removeItem(TOKEN_KEY);
+                currentState.isAuthenticated = false;
+                currentState.user = null;
+                return false;
+            }
+        }
+        
+        // --- ADMIN USER MANAGEMENT FUNCTION ---
+        function deleteUser(emailToDelete) {
+            if (currentState.user.email === emailToDelete) {
+                showMessage('Action Blocked', 'You cannot delete your own active admin account.', 'error');
+                return;
+            }
+
+            showConfirmModal(`Are you sure you want to permanently delete the account for ${emailToDelete}?`, () => {
+                const users = getUsers();
+                if (users[emailToDelete]) {
+                    delete users[emailToDelete];
+                    saveUsers(users);
+                    showMessage('Account Deleted', `The account for ${emailToDelete} has been permanently removed.`, 'success');
+                    
+                    // Re-render the admin view to show the updated list
+                    navigate('admin'); 
+                } else {
+                    showMessage('Error', 'User not found in the database.', 'error');
+                }
+            });
+        }
+
+
+        // --- 3. UI RENDERING AND ROUTING ---
+        function renderView(viewName) {
+            const container = document.getElementById('app-container');
+            currentState.currentView = viewName;
+            container.innerHTML = '';
+            
+            const isAuthenticated = checkAuthentication();
+            updateUI(); // IMPORTANT: Update UI before rendering to apply active link styles
+
+            if (viewName === 'dashboard' || viewName === 'admin') {
+                if (!isAuthenticated) {
+                    showMessage('Access Denied', 'You must be logged in to view this page. Redirecting to Login.', 'error');
+                    return renderView('login');
+                }
+                
+                // Role-based access control
+                if (viewName === 'admin' && currentState.user.role !== 'admin') {
+                    showMessage('Permission Denied', 'You do not have the required "admin" role to view this page. Redirecting to Dashboard.', 'error');
+                    return renderView('dashboard');
+                }
+            }
+
+            let htmlContent = '';
+
+            switch (viewName) {
+                case 'login':
+                    htmlContent = createLoginForm();
+                    break;
+                case 'register':
+                    htmlContent = createRegisterForm();
+                    break;
+                case 'dashboard':
+                    htmlContent = createDashboardView();
+                    break;
+                case 'admin':
+                    htmlContent = createAdminView();
+                    break;
+                default:
+                    htmlContent = createNotFoundView();
+            }
+
+            container.innerHTML = htmlContent;
+        }
+
+        function navigate(viewName) {
+            window.history.pushState({}, '', `#${viewName}`);
+            renderView(viewName);
+        }
+
+        /**
+         * Updates the navigation bar elements (buttons, links, active state) based on
+         * authentication status and current view.
+         */
+        function updateUI() {
+            const authButton = document.getElementById('auth-button');
+            const adminLink = document.getElementById('admin-link');
+            const dashboardLink = document.getElementById('dashboard-link');
+            const isAuthenticated = checkAuthentication();
+            
+            // Get the current view hash from the URL
+            const currentHash = window.location.hash.substring(1) || 'login';
+
+            // --- Reset Link Styles and Apply Active State ---
+            [dashboardLink, adminLink].forEach(link => {
+                if (!link) return;
+                // Reset to default style
+                link.className = 'text-gray-300 hover:text-accent font-medium transition duration-150';
+                
+                // Apply active style
+                if (link.id.includes(currentHash)) {
+                    link.classList.add('text-accent', 'font-bold', 'border-b-2', 'border-accent');
+                }
+            });
+
+            // --- Handle Auth Button and Visibility ---
+            authButton.className = 'px-5 py-2 text-white rounded-lg shadow-lg font-semibold transition duration-150 ease-in-out';
+            authButton.classList.add('btn-primary'); // Default Purple accent style for Login/Register
+
+            if (isAuthenticated) {
+                authButton.textContent = `Logout (${currentState.user.email})`;
+                // Style the logout button using the custom dark secondary class
+                authButton.classList.remove('btn-primary');
+                authButton.classList.add('btn-secondary-dark', 'bg-gray-600', 'hover:bg-gray-700', 'shadow-lg');
+                authButton.onclick = logoutUser;
+
+                // Show admin link if user is admin
+                if (currentState.user.role === 'admin') {
+                    adminLink.classList.remove('hidden');
+                } else {
+                    adminLink.classList.add('hidden');
+                }
+
+            } else {
+                authButton.textContent = 'Login / Register';
+                authButton.onclick = () => navigate('login');
+                adminLink.classList.add('hidden');
+            }
+        }
+
+        function handleAuthAction() {
+            if (currentState.isAuthenticated) {
+                logoutUser();
+            } else {
+                const nextView = currentState.currentView === 'login' ? 'register' : 'login';
+                navigate(nextView);
+            }
+        }
+
+        // --- 4. VIEW TEMPLATES (HTML GENERATION) ---
+        
+        function createLoginForm() {
+            return `
+                <div class="w-full max-w-md">
+                    <!-- Card uses bg-gray-800, text-white -->
+                    <div class="bg-gray-800 rounded-xl card p-10 transition-all duration-300 border border-gray-700">
+                        <h2 class="text-3xl font-black text-white text-center mb-8 tracking-wide">
+                            Secure Login
+                        </h2>
+                        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+                            <div>
+                                <label for="login-email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                                <input id="login-email" name="email" type="email" required placeholder="name@company.com"
+                                       class="appearance-none relative block w-full px-4 py-3 bg-gray-700 border border-gray-600 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-accent focus:border-accent transition duration-150">
+                            </div>
+                            <div class="relative">
+                                <label for="login-password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                                <input id="login-password" name="password" type="password" required placeholder="••••••••"
+                                       class="appearance-none relative block w-full pr-12 px-4 py-3 bg-gray-700 border border-gray-600 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-accent focus:border-accent transition duration-150">
+                                
+                                <!-- Password Toggle Button -->
+                                <button type="button" 
+                                        onclick="togglePasswordVisibility('login-password', 'login-password-toggle-icon')"
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center mt-6 text-gray-400 hover:text-accent focus:outline-none"
+                                        aria-label="Toggle password visibility">
+                                    <span id="login-password-toggle-icon">
+                                        <!-- Initial icon: Eye (hidden) -->
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </span>
+                                </button>
+                                <p id="login-error-message" class="mt-2 text-sm text-red-400 hidden">Error message placeholder</p>
+                            </div>
+                            <div>
+                                <!-- Primary button with animations -->
+                                <button type="submit"
+                                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold rounded-lg text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                    <span id="login-loading" class="hidden">
+                                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
+                                    <span id="login-button-text">Sign In</span>
+                                </button>
+                            </div>
+                        </form>
+                        <div class="mt-8 text-center border-t pt-6 border-gray-700">
+                            <p class="text-sm text-gray-400">
+                                New user?
+                                <a href="#register" onclick="navigate('register')" class="font-bold text-accent hover-text-accent">
+                                    Create Account
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createRegisterForm() {
+            return `
+                <div class="w-full max-w-md">
+                    <!-- Card uses bg-gray-800, text-white -->
+                    <div class="bg-gray-800 rounded-xl card p-10 transition-all duration-300 border border-gray-700">
+                        <h2 class="text-3xl font-black text-white text-center mb-8 tracking-wide">
+                            Register Account
+                        </h2>
+                        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-6">
+                            <div>
+                                <label for="register-email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                                <input id="register-email" name="email" type="email" required placeholder="name@company.com"
+                                       class="appearance-none relative block w-full px-4 py-3 bg-gray-700 border border-gray-600 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-accent focus:border-accent transition duration-150">
+                            </div>
+                            <div class="relative">
+                                <label for="register-password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                                <input id="register-password" name="password" type="password" required placeholder="At least 6 characters"
+                                       class="appearance-none relative block w-full pr-12 px-4 py-3 bg-gray-700 border border-gray-600 placeholder-gray-400 text-white rounded-lg focus:outline-none focus:ring-accent focus:border-accent transition duration-150">
+                                
+                                <!-- Password Toggle Button -->
+                                <button type="button" 
+                                        onclick="togglePasswordVisibility('register-password', 'register-password-toggle-icon')"
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center mt-6 text-gray-400 hover:text-accent focus:outline-none"
+                                        aria-label="Toggle password visibility">
+                                    <span id="register-password-toggle-icon">
+                                        <!-- Initial icon: Eye (hidden) -->
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </span>
+                                </button>
+                                <p id="register-error-message" class="mt-2 text-sm text-red-400 hidden">Error message placeholder</p>
+                            </div>
+                            <div>
+                                <!-- Primary button with animations -->
+                                <button type="submit"
+                                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold rounded-lg text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                                    <span id="register-loading" class="hidden">
+                                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
+                                    <span id="register-button-text">Create Account</span>
+                                </button>
+                            </div>
+                        </form>
+                        <div class="mt-8 text-center border-t pt-6 border-gray-700">
+                            <p class="text-sm text-gray-400">
+                                Already registered?
+                                <a href="#login" onclick="navigate('login')" class="font-bold text-accent hover-text-accent">
+                                    Sign In Here
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createDashboardView() {
+            const user = currentState.user || {};
+            return `
+                <!-- Card uses bg-gray-800, text-white -->
+                <div class="w-full max-w-3xl bg-gray-800 rounded-xl card p-10 border border-gray-700">
+                    <h2 class="text-4xl font-black text-white mb-6 border-b pb-4 border-gray-700 tracking-tight flex items-center">
+                        <svg class="w-8 h-8 mr-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h4"></path></svg>
+                        Welcome Home
+                    </h2>
+                    <p class="text-xl text-gray-300 mb-8">
+                        Hello, <span class="font-extrabold text-accent">${user.email}</span>. All information are safe and secure.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Info Panel 1: Profile -->
+                        <div class="bg-gray-700 p-6 rounded-lg border border-gray-600 shadow-inner">
+                            <h3 class="text-2xl font-bold text-white flex items-center mb-3 text-accent">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.204A2.001 2.001 0 0015.6 2H8.4a2 2 0 00-1.996 1.839L6 19.4a2 2 0 001.996 2.161h10.008a2 2 0 001.996-2.161L18 3.839A2.001 2.001 0 0015.6 2z"></path></svg>
+                                User Profile
+                            </h3>
+                            <ul class="text-gray-300 space-y-2">
+                                <li><span class="font-bold text-white">User ID:</span> ${user.userId || 'N/A'}</li>
+                                <li>
+                                    <span class="font-bold text-white">Role:</span> 
+                                    <span class="px-3 py-1 inline-block rounded-full text-xs font-bold ${user.role === 'admin' ? 'bg-red-900 text-red-300' : 'bg-violet-900 text-accent'}">
+                                        ${user.role.toUpperCase()}
+                                    </span>
+                                </li>
+                                <li><span class="font-bold text-white">Token Valid Until:</span> ${new Date(user.exp).toLocaleString()}</li>
+                            </ul>
+                        </div>
+
+                        ${user.role === 'admin' ? `
+                            <!-- Admin Warning Panel -->
+                            <div class="p-6 bg-red-900 rounded-lg border border-red-500 admin-glow">
+                                <h3 class="text-2xl font-bold text-red-300 flex items-center mb-3">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4h5a2 2 0 002-2v-5a2 2 0 00-2-2h-5m-7 5l4 4m0-4l-4-4"></path></svg>
+                                    Admin Access
+                                </h3>
+                                <p class="text-red-400">
+                                    Your role grants elevated privileges. Manage the system using the **Admin Panel**.
+                                </p>
+                                <!-- Primary button for navigation using custom animation class -->
+                                <button onclick="navigate('admin')" class="mt-4 px-5 py-2 btn-primary text-white rounded-lg font-semibold shadow-md">View Admin Tools</button>
+                            </div>
+                        ` : `
+                             <!-- Quick Actions Panel -->
+                             <div class="bg-gray-700 p-6 rounded-lg border border-gray-600 shadow-inner">
+                                <h3 class="text-2xl font-bold text-white flex items-center mb-3 text-accent">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    Quick Actions
+                                </h3>
+                                <p class="text-gray-300 mb-4">
+                                    Ready to get started? Navigate the secure application using the links above.
+                                </p>
+                                <!-- Secondary button for logout using custom animation class -->
+                                <button onclick="logoutUser()" class="mt-2 px-5 py-2 bg-gray-600 text-white rounded-lg font-semibold shadow-md btn-secondary-dark">Sign Out Now</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function createAdminView() {
+            const user = currentState.user || {};
+            const allUsers = getUsers();
+            const userList = Object.values(allUsers).sort((a, b) => a.email.localeCompare(b.email));
+
+            let userRows = userList.map(u => `
+                <tr class="border-b border-gray-700 hover:bg-gray-700 transition duration-150">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${u.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        <span class="px-3 py-1 inline-block rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-red-900 text-red-300' : 'bg-violet-900 text-accent'}">
+                            ${u.role.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        ${u.email === user.email ? 
+                            '<span class="text-gray-500 italic">Active Admin</span>' : 
+                            `<button onclick="deleteUser('${u.email}')" 
+                                class="text-red-400 hover:text-red-300 font-medium transition duration-150">
+                                Delete
+                            </button>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+
+            return `
+                <!-- Admin Card is prominently dark and red-bordered -->
+                <div class="w-full max-w-5xl bg-gray-900 rounded-xl card p-10 transition-all duration-300 border-4 border-red-500 admin-glow">
+                    <h2 class="text-4xl font-black text-red-400 mb-6 border-b pb-4 border-gray-700 flex items-center tracking-tight">
+                        <svg class="w-8 h-8 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v3h8z"></path></svg>
+                        ADMIN CONSOLE
+                    </h2>
+                    <p class="text-xl text-red-500 mb-8">
+                        Restricted Access for ${user.email}. Exercise caution when managing user accounts.
+                    </p>
+
+                    <!-- User Management Section -->
+                    <div class="bg-gray-800 p-6 rounded-lg border border-red-500">
+                        <h3 class="text-2xl font-bold text-red-400 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M14 11H5m2 8h10a2 2 0 002-2v-5a2 2 0 00-2-2H7a2 2 0 00-2 2v5a2 2 0 002 2z"></path></svg>
+                            User Accounts (${userList.length} Total)
+                        </h3>
+                        
+                        <div class="mt-4 overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-gray-700">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                            Email
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                            Role
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                    ${userRows}
+                                </tbody>
+                            </table>
+                            ${userList.length === 0 ? '<p class="p-4 text-gray-500 text-center">No users registered.</p>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Exit Button -->
+                    <div class="mt-8 text-right">
+                        <!-- Secondary button for navigation using custom animation class -->
+                        <button onclick="navigate('dashboard')" class="mt-4 px-5 py-2 bg-gray-600 text-white rounded-lg font-semibold btn-secondary-dark">Exit Admin Mode</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createNotFoundView() {
+            return `
+                <div class="w-full max-w-md text-center">
+                    <h2 class="text-5xl font-extrabold text-white mb-4">404 - Error</h2>
+                    <p class="text-xl text-gray-300 mb-6">The requested resource could not be found. Let's get you back to safety.</p>
+                    <!-- Primary button for navigation using custom animation class -->
+                    <button onclick="navigate('dashboard')" class="px-6 py-3 btn-primary text-white rounded-lg font-semibold">Go to Dashboard</button>
+                </div>
+            `;
+        }
+
+
+        // --- 5. FORM HANDLERS (Unchanged logic) ---
+        async function handleRegister(e) {
+            e.preventDefault();
+            const form = e.target;
+            const email = form.elements['email'].value;
+            const password = form.elements['password'].value;
+            const errorMessageEl = document.getElementById('register-error-message');
+            const loadingSpinner = document.getElementById('register-loading');
+            const buttonText = document.getElementById('register-button-text');
+
+            errorMessageEl.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            buttonText.textContent = 'Processing...';
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const result = await registerUser(email, password);
+
+            loadingSpinner.classList.add('hidden');
+            buttonText.textContent = 'Create Account';
+
+            if (result.success) {
+                showMessage('Success!', result.message, 'success');
+                navigate('login');
+            } else {
+                errorMessageEl.textContent = result.message;
+                errorMessageEl.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const form = e.target;
+            const email = form.elements['email'].value;
+            const password = form.elements['password'].value;
+            const errorMessageEl = document.getElementById('login-error-message');
+            const loadingSpinner = document.getElementById('login-loading');
+            const buttonText = document.getElementById('login-button-text');
+
+            errorMessageEl.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            buttonText.textContent = 'Processing...';
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const result = await loginUser(email, password);
+
+            loadingSpinner.classList.add('hidden');
+            buttonText.textContent = 'Sign In';
+
+            if (result.success) {
+                checkAuthentication();
+                updateUI();
+                navigate('dashboard');
+                showMessage('Welcome Back!', result.message, 'success');
+            } else {
+                errorMessageEl.textContent = result.message;
+                errorMessageEl.classList.remove('hidden');
+            }
+        }
+
+        // --- 6. INITIALIZATION ---
+        window.onload = function() {
+            // Initialize auth status
+            checkAuthentication(); 
+            
+            // Determine initial view based on hash or auth state
+            const initialView = window.location.hash.substring(1) || (currentState.isAuthenticated ? 'dashboard' : 'login');
+            
+            // Set the state and render the view
+            currentState.currentView = initialView;
+            renderView(initialView); 
+            
+            // Set up hash change listener for navigation
+            window.onhashchange = () => {
+                const newView = window.location.hash.substring(1);
+                if (newView) {
+                    renderView(newView);
+                }
+            };
+        };
+    </script>
+</body>
+</html>
+

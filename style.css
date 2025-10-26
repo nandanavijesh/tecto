@@ -1,0 +1,62 @@
+/* * Custom CSS for the Secure Auth System - Charcoal Gray Edition
+ * Focus: High-contrast dark theme using charcoal grays and a vibrant cyan accent.
+ */
+
+/* 1. Font Definition (Lato remains for readability) */
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+/* 2. Dark Body Background Theme (Deep Charcoal Gradient) */
+body {
+    /* Deep charcoal background for the main canvas */
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Slate/Blue-Gray variant */
+    min-height: 100vh;
+    /* Main text color is soft white */
+    color: #f3f4f6;
+}
+
+/* 3. Card Interaction and Shadow Enhancement */
+.card {
+    /* Cards are slightly lighter gray to stand out from the background */
+    background-color: #1f2937; /* Darker card background */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+    /* Smooth transition for subtle effects */
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.card:hover {
+    /* Slight lift on hover */
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+
+/* 4. Admin Panel Warning (High-contrast red on dark background) */
+.admin-glow {
+    /* Keep the red warning, with an internal glow */
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.8), inset 0 0 5px rgba(239, 68, 68, 0.4); 
+    border: 1px solid rgba(239, 68, 68, 0.6);
+}
+
+/* 5. VIBRANT ACCENT COLOR UTILITIES (New Cyan Accent) */
+.btn-primary {
+    /* Use a vibrant cyan for primary actions */
+    background-color: #06b6d4; /* Tailwind cyan-500 */
+    box-shadow: 0 4px 10px rgba(6, 182, 212, 0.5);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0891b2; /* Tailwind cyan-600 */
+    box-shadow: 0 6px 15px rgba(6, 182, 212, 0.8);
+}
+
+.text-accent {
+    color: #06b6d4;
+}
+
+.hover-text-accent:hover {
+    color: #0891b2;
+}
+
