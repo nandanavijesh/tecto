@@ -1,0 +1,11 @@
+tests/
+src/
+examples/
+node_modules/
+.vscode/
+.gitignore
+biome.json
+bun.lock
+tsup.config.ts
+tsconfig.json
+.npmignore

@@ -1,0 +1,47 @@
+{
+  "name": "tecto",
+  "version": "1.0.1",
+  "description": "Transport Encrypted Compact Token Object — an opaque, XChaCha20-Poly1305 encrypted token protocol",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.14",
+    "@noble/ciphers": "1.2.1",
+    "@scure/base": "1.2.4",
+    "@types/bun": "1.2.4",
+    "tsup": "8.4.0",
+    "typescript": "5.9.3"
+  },
+  "repository": {
+    "url": "https://github.com/Zastinian/tecto"
+  },
+  "keywords": [
+    "tecto",
+    "token",
+    "encryption",
+    "xchacha20",
+    "chacha20-poly1305",
+    "aead",
+    "opaque-token",
+    "cryptography",
+    "security",
+    "auth",
+    "session",
+    "keystore"
+  ],
+  "license": "MIT"
+}
