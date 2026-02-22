@@ -368,8 +368,160 @@ describe("TectoCoder — JTI Parsing", () => {
   });
 });
 
-function createCoderHelper(): TectoCoder {
+describe("Security Hardening", () => {
+  test("getKey returns defensive clone (mutation safety)", () => {
+    const store = new MemoryKeyStore();
+    const originalKey = generateSecureKey();
+    store.addKey("test-key", originalKey);
+
+    const retrievedKey1 = store.getKey("test-key");
+    const retrievedKey2 = store.getKey("test-key");
+
+    retrievedKey1[0] = 0xff;
+
+    expect(retrievedKey2[0]).not.toBe(0xff);
+    expect(retrievedKey1).not.toEqual(retrievedKey2);
+  });
+
+  test("decrypt rejects empty kid (token structure validation)", () => {
+    const coder = createCoderHelper();
+    const malformedToken = "tecto.v1...c3J5cHQ=.Y2lwaGVy";
+    expect(() => coder.decrypt(malformedToken)).toThrow(InvalidSignatureError);
+  });
+
+  test("parseDuration rejects values exceeding 10 years", () => {
+    const coder = createCoderHelper();
+    expect(() => coder.encrypt({ data: "test" }, { expiresIn: "999999999d" })).toThrow();
+  });
+
+  test("TokenExpiredError hides exact expiration date in message", () => {
+    const store = new MemoryKeyStore();
+    store.addKey("test-key", generateSecureKey());
+    const coderForExpiry = new TectoCoder(store);
+    const pastExpToken = coderForExpiry.encrypt({
+      data: "test",
+      exp: Math.floor(Date.now() / 1000) - 100,
+    });
+
+    try {
+      coderForExpiry.decrypt(pastExpToken);
+      expect(true).toBe(false);
+    } catch (err) {
+      expect(err).toBeInstanceOf(TokenExpiredError);
+      const error = err as TokenExpiredError;
+      expect(error.message).toBe("Token is invalid");
+      expect(error.expiredAt).toBeInstanceOf(Date);
+    }
+  });
+
+  test("TokenNotActiveError hides exact activation date in message", () => {
+    const coder = createCoderHelper();
+    const futureToken = coder.encrypt({ data: "test" }, { expiresIn: "1h", notBefore: "1h" });
+    try {
+      coder.decrypt(futureToken);
+      expect(true).toBe(false);
+    } catch (err) {
+      expect(err).toBeInstanceOf(TokenNotActiveError);
+      const error = err as TokenNotActiveError;
+      expect(error.message).toBe("Token is invalid");
+      expect(error.activeAt).toBeInstanceOf(Date);
+    }
+  });
+
+  test("rejects payload exceeding MAX_PAYLOAD_SIZE (DoS prevention)", () => {
+    const coder = createCoderHelper();
+    const hugePayload: Record<string, unknown> = { data: "x".repeat(1024 * 1024 + 1) };
+    expect(() => coder.encrypt(hugePayload)).toThrow();
+  });
+
+  test("validates kid format (alphanumeric + ._- only)", () => {
+    const coder = createCoderHelper();
+    const invalidKids = [
+      "tecto.v1.key@invalid.c3J5cHQ=.Y2lwaGVy",
+      "tecto.v1.key!invalid.c3J5cHQ=.Y2lwaGVy",
+      "tecto.v1.key<script>.c3J5cHQ=.Y2lwaGVy",
+    ];
+
+    invalidKids.forEach((token) => {
+      expect(() => coder.decrypt(token)).toThrow(InvalidSignatureError);
+    });
+  });
+
+  test("validates exp/nbf/iat are numbers (type confusion prevention)", () => {
+    const store = new MemoryKeyStore();
+    const key = generateSecureKey();
+    store.addKey("test-key", key);
+    const coder = new TectoCoder(store);
+
+    const token = coder.encrypt({ data: "test", exp: "not-a-number" as unknown as number });
+
+    try {
+      coder.decrypt(token);
+      expect(true).toBe(false);
+    } catch (err) {
+      expect(err).toBeInstanceOf(InvalidSignatureError);
+    }
+  });
+
+  test("validates registered claims types (exp/nbf/iat/jti/iss/aud)", () => {
+    const store = new MemoryKeyStore();
+    const key = generateSecureKey();
+    store.addKey("test-key", key);
+    const coder = new TectoCoder(store);
+
+    const validToken = coder.encrypt(
+      { data: "test" },
+      { jti: "valid-uuid", issuer: "issuer-claim", audience: "audience-claim", expiresIn: "1h" },
+    );
+
+    const payload = coder.decrypt(validToken);
+    expect(payload.jti).toBe("valid-uuid");
+    expect(payload.iss).toBe("issuer-claim");
+    expect(payload.aud).toBe("audience-claim");
+    expect(payload.exp).toBeNumber();
+  });
+
+  test("allows large but valid payloads (just under 1MB limit)", () => {
+    const coder = createCoderHelper();
+    const largePayload = { data: "x".repeat(900 * 1024) };
+    const token = coder.encrypt(largePayload);
+    const decrypted = coder.decrypt<{ data: string }>(token);
+    expect(decrypted.data).toBeString();
+    expect((decrypted.data as string).length).toBeGreaterThan(900 * 1024 - 100);
+  });
+
+  test("allows custom maxPayloadSize configuration", () => {
+    const smallMaxSize = 1024;
+    const coder = createCoderHelper({ maxPayloadSize: smallMaxSize });
+
+    const token = coder.encrypt({ data: "x".repeat(100) });
+    const decrypted = coder.decrypt(token);
+    expect(decrypted.data).toBeString();
+
+    expect(() => coder.encrypt({ data: "x".repeat(2000) })).toThrow();
+  });
+
+  test("rejects invalid maxPayloadSize configuration", () => {
+    const store = new MemoryKeyStore();
+    store.addKey("test-key", generateSecureKey());
+
+    expect(() => new TectoCoder(store, { maxPayloadSize: 0 })).toThrow();
+    expect(() => new TectoCoder(store, { maxPayloadSize: -1 })).toThrow();
+    expect(() => new TectoCoder(store, { maxPayloadSize: 1.5 })).toThrow();
+  });
+
+  test("tokens without expiresIn never expire", () => {
+    const coder = createCoderHelper();
+    const token = coder.encrypt({ data: "test" });
+    const decrypted = coder.decrypt(token);
+    expect(decrypted.exp).toBeUndefined();
+
+    expect(decrypted.data).toBe("test");
+  });
+});
+
+function createCoderHelper(options?: { maxPayloadSize?: number }): TectoCoder {
   const store = new MemoryKeyStore();
   store.addKey("test-key", generateSecureKey());
-  return new TectoCoder(store);
+  return new TectoCoder(store, options);
 }
